@@ -1,4 +1,4 @@
-import pygame, time  , math 
+import pygame, time  , math , random
 
 
 from buttons import UIButton 
@@ -40,14 +40,14 @@ class GameScreen(Screen):
 
 		home_players = [Player((100,200,), "striker", side = "home"),GoalKeeper(goal_lines[0])]
 		away_players = [Player((100,450,), "striker",side = "away"),GoalKeeper(goal_lines[1])]
-
+		all_players = home_players + away_players
 		self.world.AddEntities([ball  ] + away_players +home_players  + goal_lines)
 		self.game_manager = GameManager()
 
 		for p in self.world.GetEntities(Player):
 			p.world = self.world
 
-
+		self.game_manager.Reset(random.choice(["home", "away" ]), all_players , ball, goal = False)
 
 
 

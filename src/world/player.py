@@ -1,29 +1,52 @@
 
 
 
-import pygame
+import pygame,random ,math, time 
 
 import tools 
 from .entity import Entity 
-from .ball import Ball 
+from .ball import Ball ,GoalLine
 from key_mapping import CONTROLS  
 
  
 class BasePlayer(Entity):
 
 
-	def __init__(self, pos,size = (50,50 ), hitbox_color = (23,56,85) , side = "home" ):
+	def __init__(self, pos,size = (30,30 ), hitbox_color = (23,56,85) , side = "home" ):
 		Entity.__init__(self, pos , size =size , hitbox_color = hitbox_color )
 		self.side = side 
 		self.HAS_BALL = False 
+		self.SHOOTING = False
 		self.world = None 
-
-
+		self.shoot_timer = 0 
+		self.shoot_limit = 100
+		self.shoot_speed = 6
+		self.last_touch_time = 0
 
 	def Shoot(self):
+		if not self.HAS_BALL:
+			return
+
+		w = self.world 
+		self.HAS_BALL = False
 		ball = self.world.GetEntities(Ball)[0]
-		print(ball.hitbox.midleft)
-		
+
+		if tools.DistanceBetween(self.hitbox.center , ball.hitbox.center) > 30:
+			return
+		goal_line = [ g for g in w.GetEntities(GoalLine)  if g.side != self.side][0]
+		# target_y= random.choice([goal_line.hitbox.y +  10 for  i in  range(10)])
+		target_pos = goal_line.hitbox.center
+
+		angle = tools.GetAngleBetween(   ball.hitbox.center, target_pos)
+
+		vx = math.cos(math.radians(angle)) * self.shoot_speed
+		vy = math.sin(math.radians(angle)) * self.shoot_speed
+
+
+		self.SHOOTING = True 
+
+		ball.vel = vx,vy
+		self.last_touch_time = time.time()
 class AI_Player(BasePlayer):
 
 
@@ -62,7 +85,7 @@ class Player(BasePlayer):
 	def __init__(self, pos,role,  side  = "home" ):
 
 		hitbox_color = pygame.Color("orange") if side == "home" else pygame.Color("cyan")
-		BasePlayer.__init__(self, pos , size = (50,50), hitbox_color = hitbox_color , side = side )
+		BasePlayer.__init__(self, pos , size = (30,30), hitbox_color = hitbox_color , side = side )
 		self.role = role
 		self.MOVE_LOCK = True
 		self.side = side
@@ -70,6 +93,8 @@ class Player(BasePlayer):
 		self.ball_position = (self.hitbox.topright)
 
 		self.touch_distance =  40
+
+
 
 
 
@@ -86,15 +111,17 @@ class Player(BasePlayer):
 		if keys[c['left']]  and self.hitbox.topleft[0] > 0  :
 			self.Move("left")
 			p = list(self.hitbox.midleft)
-			p[0] = p[0] - 25 
-			self.ball_position = p  
+			bp_x = p[0] - 10
+			bp_y = p[1] - 5
+			self.ball_position = bp_x, bp_y
 
 
 		if keys[c['up']] and self.hitbox.y > 110  :
 			self.Move("up")
 			p = list(self.hitbox.midtop)
-			p[1] = p[1] - 25 
-			self.ball_position = p  
+			bp_x = p[0] - 5
+			bp_y = p[1] - 10
+			self.ball_position = bp_x, bp_y
 
 
 		if keys[c['down']] and self.hitbox.midbottom[1] < 500  :
@@ -108,6 +135,13 @@ class Player(BasePlayer):
 	 	
 
 	def CustomDisplay(self , window , mouse_pos , events, keys ):
+		if self.SHOOTING:
+			self.shoot_timer += 1
+
+			if self.shoot_timer > self.shoot_limit:
+				self.shoot_timer = 0 
+				self.SHOOTING = False
+
 		self.HandleMovement(events, keys )
 
 
@@ -121,7 +155,7 @@ class GoalKeeper(BasePlayer):
 	def __init__(self,   goal_line  ):
 		side = goal_line.side
 		
-		BasePlayer.__init__(self, goal_line.pos , size = (50,50), hitbox_color = (3,6,65) )
+		BasePlayer.__init__(self, goal_line.pos , size = (30,30), hitbox_color = (3,6,65) )
 
 
 		self.MOVE_LOCK = True
@@ -131,7 +165,9 @@ class GoalKeeper(BasePlayer):
 		if side == "away":
 			bp = self.hitbox.topleft
 			self.ball_position = bp[0] - 30, bp[1]
-			self.pos = goal_line.hitbox.midleft
+			x = goal_line.hitbox.topright[0] - self.width
+			y = goal_line.hitbox.y +10 
+			self.UpdatePos((x,y))
 		elif side == "home":
 			bp = self.hitbox.topright
 			self.ball_position = bp

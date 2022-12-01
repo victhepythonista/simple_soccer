@@ -26,7 +26,13 @@ class Entity:
         
         self.SHOW_HITBOX = True
        
- 
+    def UpdatePos(self, new_pos):
+        self.pos =  new_pos 
+        self.x, self.y = new_pos 
+        self.hitbox  = pygame.Rect(self.x, self.y, self.width, self.height)
+        
+
+
     def Update(self):
         self.MoveFreely()
         x,y = self.pos

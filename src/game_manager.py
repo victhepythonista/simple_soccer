@@ -4,13 +4,13 @@ import math
 import pygame
 
 
+from tools import DistanceBetween
+
 from ui import GoalAnnouncement 
 from world import GoalKeeper
 
 
-def DistanceBetween(p1, p2):
-	distance = math.sqrt( ((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2) )
-	return distance
+pitch_rect = pygame.Rect(0,100,900,400)
 class GameManager:
 	"""
 	manages the game  
@@ -24,17 +24,26 @@ class GameManager:
 		
 
 
-	def Reset(self, side , players, ball ):
+	def Reset(self, side , players, ball ,goal = True  ):
 		strikers = [ p for p in players if not isinstance(p, GoalKeeper) ]
-		ball.pos = 450,200 
-		GoalAnnouncement().show()
+
+		if   goal:
+			GoalAnnouncement().show()
+
+
+		for p in strikers:
+			if p.side == "home":
+				p.UpdatePos((300,300))
+				if side != p.side:
+					ball.UpdatePos(p.hitbox.topright)
+			if p.side == "away":
+				p.UpdatePos((700,300))
+				if side != p.side:
+					ball.UpdatePos(p.hitbox.topright)
 
 
 
-
-
-
-
+ 
 	def DetectGoal(self , ball , goal_lines, players):
 		for g in goal_lines:
 			if g.hitbox.colliderect(ball.hitbox):
@@ -43,20 +52,35 @@ class GameManager:
 				self.Reset(side, players, ball )
 				return 
 
+
+
+
+ 
 	def AssignPossesion(self, ball , players):
 		positions = [p.hitbox.center  for p in players]
 		ball_p =  ball.hitbox.center
 		touch_distance = 50
 
 		location_diff = [  DistanceBetween(ball_p , p)  for  p in  positions ]
+		dist  = min(location_diff)
 	 
-	 
-		ind =  location_diff.index(min(location_diff))
-		if not ind <= 45:
+		ind =  location_diff.index(dist)
+		if  dist > 40 :
 			return 
 
+
 		player =  players[ind]
+
+		if  player.SHOOTING:
+			return 
+
+		# print("ASSIGNED POSTION TO ", player)
+
 		player.HAS_BALL = True 
 		ball.UpdatePos(  player.ball_position)
-		ball.speed = (0,0)
+		ball.vel= (0,0)
+
+		for p in players:
+			if p != player:
+				p.HAS_BALL = False
 

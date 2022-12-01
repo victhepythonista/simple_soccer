@@ -20,6 +20,9 @@ def iload(path):
 
 
 
+def DistanceBetween(p1, p2):
+    distance = math.sqrt( ((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2) )
+    return distance
  
 
 def GetAngleBetween(pA, pB):
@@ -27,19 +30,12 @@ def GetAngleBetween(pA, pB):
   changeInY = pB[1] - pA[1]
   return degrees(atan2(changeInY,changeInX))  
 
-def GetPointOnCirc(angle , center , radius):
-    r = radius
-    cx,cy = center 
-    x =  math.cos(angle)*r   
-    y = math.sin(angle)*r  
-
-    return x,y 
-
-
+ 
  
 
 if __name__ == '__main__':
+    a = 2,2
+    b = 10,2
 
-
-    print(GetPointOnCirc(90 , (1,1) , 3))
+    print(GetAngleBetween(a,b))
 
