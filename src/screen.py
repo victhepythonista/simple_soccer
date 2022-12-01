@@ -1,4 +1,4 @@
-import pygame, sys, os, numpy
+import pygame, sys, os 
 
 
 
@@ -8,11 +8,12 @@ class Screen:
     a basic screen
 
     '''
-    def __init__(self, size = (500,600), fps = 50, title = 'basic screen', noframe = False):
+    def __init__(self, size = (900,500), fps = 50, title = 'basic screen', noframe = False):
         pygame.init()
         self.running = True
         self.name = ""
         self.size = size
+        self.keys = []
         self.clock = pygame.time.Clock()
         self.fps = fps
         self.events = pygame.event.get()
@@ -44,6 +45,7 @@ class Screen:
         while self.running:
             self.display_widgets()
             self.events = pygame.event.get()
+            self.keys = pygame.key.get_pressed()
             self.screen_backend()
 
             self.quit_event()

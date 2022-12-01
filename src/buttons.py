@@ -1,5 +1,5 @@
 
-import pygame, os, numpy
+import pygame, os 
 from tools import write_on_screen
 
 

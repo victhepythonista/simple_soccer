@@ -1,3 +1,6 @@
+
+
+
 from os.path import join
 
 data = "./data"
@@ -5,8 +8,6 @@ data = "./data"
 
 
 images_path = ip = join(data, "images")
-images = {
-	"home_bg": join(images_path,"field.png"),
-	"pitch":join(ip , "pitch.png")
 
-}
+
+ball = join(ip , "ball1.png")

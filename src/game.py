@@ -1,12 +1,14 @@
-import pygame, time  
+import pygame, time  , math 
 
 
 from buttons import UIButton 
 from screen import Screen
 from tools import write_on_screen as wos , iload 
-
+from animation import PointAnimation
 from paths import images 
-from world import World , Entity ,Ball 
+from world import World , Entity ,Ball ,Player ,AI_Player,GoalLine ,GoalKeeper
+from game_manager import GameManager
+
 
 
 
@@ -24,7 +26,6 @@ class GameScreen(Screen):
 	def __init__(self):
 		Screen.__init__(self)
 
-		self.score = [0,0]
 		self.entities = [] 
 		self.paused = False 
 		self.buttons = [ 
@@ -33,11 +34,19 @@ class GameScreen(Screen):
 
 
 		 ]
-
-
 		self.world = World() 
+		goal_lines = [GoalLine((-10, 250),"home") , GoalLine((890,250), "away")]
 		ball = Ball((200,100))
-		self.world.AddEntities([ball  ,])
+
+		home_players = [Player((100,200,), "striker", side = "home"),GoalKeeper(goal_lines[0])]
+		away_players = [Player((100,450,), "striker",side = "away"),GoalKeeper(goal_lines[1])]
+
+		self.world.AddEntities([ball  ] + away_players +home_players  + goal_lines)
+		self.game_manager = GameManager()
+
+		for p in self.world.GetEntities(Player):
+			p.world = self.world
+
 
 
 
@@ -49,22 +58,30 @@ class GameScreen(Screen):
 	def Pause(self):
 		print("paused")
 	def ShowScores(self):
-		s = self.score 
-		wos(f"PC {s[0]} : {s[1]} YOU  " ,( 100,50) , self.window , (0,30,60) , 40)
+		scores = self.game_manager.scores
+		wos(f"{scores['home']} |  {scores['away']}   " ,( 100,50) , self.window , (0,30,60) , 40)
 
 
 
 
  
 	def display_widgets(self):
+		self.window.fill((77,115,20))
 
-		self.window.blit(iload(images["home_bg"]), (0, 100))
+		ball = self.world.GetEntities(Ball)[0]
+		players = self.world.GetEntities(Player)
+		goal_lines = self.world.GetEntities(GoalLine)
+
+		self.window.blit(iload(images["pitch"]), (0, 100))
 		#message, position, window, color, fontsize,
 		self.ShowScores()
 		for b in self.buttons:
 			b.show(self.window, pygame.mouse.get_pos() , self.events)
 
-		self.world.show(self.window , self.events , pygame.mouse.get_pos())
+		self.game_manager.Manage(ball , players ,goal_lines )
+		self.world.show(self.window , self.events , pygame.mouse.get_pos(), self.keys)
+
+
 
 # home screen 
 class HomeScreen(Screen):
