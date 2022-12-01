@@ -3,11 +3,12 @@
 
 import pygame,random ,math, time 
 
-import tools 
+import tools , colors
 from .entity import Entity 
 from .ball import Ball ,GoalLine
 from key_mapping import CONTROLS  
 
+side = ["home", "away"]
  
 class BasePlayer(Entity):
 
@@ -24,9 +25,7 @@ class BasePlayer(Entity):
 		self.last_touch_time = 0
 
 	def Shoot(self):
-		if not self.HAS_BALL:
-			return
-
+		 
 		w = self.world 
 		self.HAS_BALL = False
 		ball = self.world.GetEntities(Ball)[0]
@@ -84,7 +83,7 @@ class Player(BasePlayer):
 
 	def __init__(self, pos,role,  side  = "home" ):
 
-		hitbox_color = pygame.Color("orange") if side == "home" else pygame.Color("cyan")
+		hitbox_color = colors.home_team if side == "home" else colors.away_team
 		BasePlayer.__init__(self, pos , size = (30,30), hitbox_color = hitbox_color , side = side )
 		self.role = role
 		self.MOVE_LOCK = True
@@ -141,6 +140,8 @@ class Player(BasePlayer):
 			if self.shoot_timer > self.shoot_limit:
 				self.shoot_timer = 0 
 				self.SHOOTING = False
+		if self.HAS_BALL:
+			self.last_touch_time = time.time()
 
 		self.HandleMovement(events, keys )
 
@@ -154,25 +155,64 @@ class GoalKeeper(BasePlayer):
 
 	def __init__(self,   goal_line  ):
 		side = goal_line.side
+		hitbox_color = colors.home_team if side == "home" else colors.away_team
 		
-		BasePlayer.__init__(self, goal_line.pos , size = (30,30), hitbox_color = (3,6,65) )
-
-
+		
+		BasePlayer.__init__(self, goal_line.pos , size = (30,30), hitbox_color = hitbox_color )
+		self.radar = None 
+		self.radar_w  = 400 
+		self.radar_h = 400 
 		self.MOVE_LOCK = True
-		self.vel = (0,0)
+		self.vel = (0,2)
 		self.goal_line = goal_line 
 
 		if side == "away":
 			bp = self.hitbox.topleft
 			self.ball_position = bp[0] - 30, bp[1]
-			x = goal_line.hitbox.topright[0] - self.width
+			x = 900 - self.width
 			y = goal_line.hitbox.y +10 
+			self.radar = pygame.Rect(self.x - 200, self.y - 100, self.radar_w,self.radar_h )
 			self.UpdatePos((x,y))
 		elif side == "home":
 			bp = self.hitbox.topright
 			self.ball_position = bp
 			self.pos = goal_line.hitbox.midright
+			self.radar = pygame.Rect(self.x ,self.y - 200 ,  self.radar_w , self.radar_h )
+
 		self.ball_position = (self.hitbox.topright)
 
 
-		
+	def UpdateRadar(self ):
+		if side == "away":
+		 
+			self.radar = pygame.Rect(self.x - 200, self.y - 100, 300,300 )
+		elif side == "home":
+			 
+			self.radar = pygame.Rect(self.x ,self.y - 200 , 300,300 )
+ 
+	def CustomDisplay(self , window , mouse_pos , events, keys ):
+		self.UpdateRadar( )
+	def Shoot(self):
+		if not self.HAS_BALL:
+			return
+
+		self.HAS_BALL = False
+		w = self.world
+
+
+		ball = [b for b in w.GetEntities(Ball) ][0]
+
+		target =   450, random.choice( [ i for i in range(100, 500)])
+		angle = tools.GetAngleBetween(   ball.hitbox.center, target)
+
+		vx = math.cos(math.radians(angle)) * self.shoot_speed
+		vy = math.sin(math.radians(angle)) * self.shoot_speed
+		self.SHOOTING = True 
+
+		ball.vel = vx,vy
+		self.last_touch_time = time.time()
+
+
+
+
+

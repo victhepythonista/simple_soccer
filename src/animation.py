@@ -39,7 +39,7 @@ class InfoAnimation(Animation):
 class PointAnimation:
     '''
     points will have an effect of floating up and dissapearing'''
-    def  __init__(self, message, position,time_limit = 100, font_size = 20, color = (0,145,0)):
+    def  __init__(self, message, position,time_limit = 100, font_size = 40, color = (0,65,150)):
         Animation.__init__(self, message, position, time_limit,font_size, color)
         pos_x = int(position[0])
         self.x = random.randint(pos_x - 50, pos_x + 50)
