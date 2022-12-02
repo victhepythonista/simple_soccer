@@ -3,6 +3,7 @@
 import math 
 import pygame
 import random
+import time
 
 from tools import DistanceBetween,OppositeSide 
 
@@ -15,13 +16,15 @@ GOAL_LIMIT = 5
 pitch_rect = pygame.Rect(0,100,900,400)
 class GameManager:
 	"""
-	manages the game  mechanics and logic 
+	manages the game  mechanics and logics
 
 
 	"""
 	def __init__(self):
 		self.scores = {"home":0 , "away":0}
+		self.scores_file = "RESULTS.txt"
 	def Manage(self, world ):
+		# run the methods for managing the game
 		# 
 
 		ball = world.GetEntities(Ball)[0]
@@ -33,13 +36,18 @@ class GameManager:
 		self.BackendManagement(goal_keepers, ball , goal_lines, players )
 		self.AssignPossesion(ball ,  players)
 		
+	def SaveScores(self):
+		# save the game scores
+		print("SAVING SCORES --")
+		score = self.scores
+		with open(self.scores_file, "a") as f:
+			f.write(f"{time.time()} :  {score['home'] }   |    {score['away']}")
 
 	def BackendManagement(self, goal_keepers, ball, goal_lines , players  ):
 		# DETECT BALL OUTSIDE THE PITCH RECT 
-
 		if not ball.hitbox.colliderect( pitch_rect):
-			last_to_touch = self.GetLastTouch(players)
-			
+			last_to_touch = self.GetLastTouch(players) 
+			# reset the game
 			self.Reset( OppositeSide(last_to_touch), players, ball,goal_keepers, goal_lines, goal = False )
 			GS.play("ball_out")
 			return
@@ -54,18 +62,21 @@ class GameManager:
 				opp = sides[0]
 				GS.play("score_goal")
 
-				self.scores[opp]+= 1
+				self.scores[opp]+= 1 # increase the goals for the player
 				if self.scores[opp] >= GOAL_LIMIT:
 					# Announce  a goal has been scored 
 					Announcement(f"WINNER   {opp}!!    ").show()
-					GS.play("score_goal")
+					self.SaveScores() # save scores
+					GS.play("score_goal") # play the goal scored sound
 
 					self.scores["home"] = 0
 					self.scores["away"] = 0
 					self.Reset(side , players, ball, goal_keepers , goal_lines)
 					return
-				GoalAnnouncement().show()
-				ball.vel = (0,0)
+				GoalAnnouncement().show() # show the goal announcement
+				ball.vel = (0,0) # change the ball velocity
+
+				# reset the game
 				self.Reset(side, players, ball , goal_keepers , goal_lines)
 				print("GOAAAAALL   ", opp)
 
@@ -83,12 +94,15 @@ class GameManager:
 			gc = g.hitbox.center
 			bc = ball.hitbox.center
 			g.HAS_BALL = False
+			g.UpdateRadar()
+			# check if the goalkeeper has collided with the ball 
 			if g.hitbox.colliderect(ball.hitbox):
 				g.HAS_BALL = True
 
 				if g.HAS_BALL:
-					g.Shoot()
+					g.Shoot() # shoot the ball 
 					g.HAS_BALL = False
+					GS.play("deflect")
 
 			diff = gc[1] - bc[1]
 
@@ -107,11 +121,14 @@ class GameManager:
 		"""
 		side -> side that had the ball last
 		 """
-
-		print("GOAL lineS -->" , goal_lines)
-		print("goal_keeper  ./ s", goal_keepers)
+ 		# get the strikers
 		strikers = [ p for p in players if not isinstance(p, GoalKeeper) ]
+
+		# get the sides 
 		sides = [p.side for p in goal_keepers]
+
+		# adjust side appropriately 
+		# ! for the side bug issue -->FIXES IT !!
 		if sides[0] == sides[1]:
 			print("SAME SIDE")
 			strikers[1].side  = OppositeSide(sides[0])
@@ -122,6 +139,7 @@ class GameManager:
 
 		goal_limit = line.hitbox.y, line.hitbox.bottomright[1] 
 
+		# iterate the strikeer and update their position
 		for p in strikers:
 			w = p.world
 			if p.side == "home":
@@ -173,6 +191,9 @@ class GameManager:
 		dist  = min(location_diff)
 	 
 		ind =  location_diff.index(dist)
+
+		# check if the player is within the correct distance to 
+		# possess the ball 
 		if  dist > 40 :
 			return 
 
@@ -192,3 +213,6 @@ class GameManager:
 			if p != player:
 				p.HAS_BALL = False
 
+if __name__ == '__main__':
+	# testing..
+	GameManager().SaveScores()

@@ -14,8 +14,11 @@ class Animation:
         self.message = message
         self.dead = False
         self.sound_name = sound_name
+
+    # display the animation
     def show(self, window):
         self.timer += 1
+        # check if time lmit is reached
         if self.timer >= self.time_limit:
             self.dead = True
         write_on_screen(self.message, self.position, window, self.color, self.font_size)
@@ -51,31 +54,4 @@ class PointAnimation:
         if self.timer >= self.time_limit:
             self.dead = True
         write_on_screen(self.message, (self.x,self.y), window, self.color, self.font_size)
-class Animator:
-    '''
-    handles several animations at a time
-    '''
-    def __init__(self):
-        self.animations = []
-
-    def get_point_message_y(self):
-        if self.animations != []:
-            y = self.animations[-1].y + 100
-            return y
-        else:
-            return random.randint(100,400)
-
-    def  point(self,pos,point_value ,message ,font_size = 15,color = (65,145,45) ,point_color = (0,200,0)):
-       # point_info = InfoAnimation(message, (random.randint(100,300),self.get_point_message_y()), font_size = font_size, color = color)
-        pos = random.randint(int(pos[0]),int(pos[0])+ 50), random.randint(int(pos[1]),int(pos[1])+ 50)
-        point = PointAnimation(str(point_value),pos,font_size = 30,color = point_color)
-        self.animations.append(point )
-       # self.animations.append(point_info )
-    def show(self,window):
-        for animation in self.animations:
-            animation.show(window)
-            if animation.dead:
-                self.animations.pop(self.animations.index(animation))
-    def clear(self):
-        del(self.animations)
-        self.animations = []
+ 

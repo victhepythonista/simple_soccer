@@ -1,4 +1,4 @@
-
+#IMAGES USED IN THE GAME ARE FOUND HERE 
 
 
 from os.path import join

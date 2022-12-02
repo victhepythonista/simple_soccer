@@ -1,9 +1,15 @@
+# EXTRA UI SCREENS AND WIDGETS
+
 from screen import Screen
 
 from animation import PointAnimation
 
 class GoalAnnouncement(Screen):
+	"""
 
+	screen FOR ANNOUNCING A GOAL 
+
+	"""
 	def __init__(self):
 		Screen.__init__(self)
 
@@ -22,7 +28,9 @@ class GoalAnnouncement(Screen):
 
 class Announcement(Screen):
 
+	"""
 
+	A SCREEN FOR GENERAL ANNOUNCEMENTS/POPUPS"""
 	def __init__(self, message):
 		Screen.__init__(self)
 

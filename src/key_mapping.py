@@ -1,3 +1,5 @@
+# GAME  controls here !!
+
 import pygame as pg 
 
 CONTROLS = {

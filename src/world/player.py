@@ -14,11 +14,19 @@ from sounds import GameSounds as GS
 side = ["home", "away"]
  
 class BasePlayer(Entity):
+	"""
 
+	A simple player ..
+	can shoot and posses a ball by default 
+
+	controlled by the user 
+
+
+	"""
 
 	def __init__(self, pos,size = (30,30 ), hitbox_color = (23,56,85) , side = "home" ):
 		Entity.__init__(self, pos , size =size , hitbox_color = hitbox_color )
-		self.side = side 
+		self.side = side  # away or home
 		self.HAS_BALL = False 
 		self.SHOOTING = False
 		self.world = None 
@@ -29,20 +37,27 @@ class BasePlayer(Entity):
 
 	def __str__(self):
 		return "PLAYER > " + self.side
+
+	# shoot the ball 
 	def Shoot(self):
 		 
 		w = self.world 
 		self.HAS_BALL = False
 		ball = self.world.GetEntities(Ball)[0]
 
+		# check  if ball within reach ...return if not
 		if tools.DistanceBetween(self.hitbox.center , ball.hitbox.center) > 30:
 			return
+
+		# get the goal line 
 		goal_line = [ g for g in w.GetEntities(GoalLine)  if g.side != self.side][0]
 		# target_y= random.choice([goal_line.hitbox.y +  10 for  i in  range(10)])
 		target_pos = goal_line.hitbox.center
 
+		# get the angle between the ball and the goal
 		angle = tools.GetAngleBetween(   ball.hitbox.center, target_pos)
 
+		# calculate the new ball velocity
 		vx = math.cos(math.radians(angle)) * self.shoot_speed
 		vy = math.sin(math.radians(angle)) * self.shoot_speed
 
@@ -52,36 +67,6 @@ class BasePlayer(Entity):
 		ball.vel = vx,vy
 		self.last_touch_time = time.time()
 		GS.play("shoot")
-class AI_Player(BasePlayer):
-
-
-	def __init__(self, pos,role , ball  ):
-		BasePlayer.__init__(self, pos , size = (50,50), hitbox_color = (20,2,9) )
-		self.role = role
-		self.ball =  ball 
-		self.MOVE_LOCK = False 
-		self.vel = (0,0)
-		self.angle = 0
-
-
-
-
-	 
-	def CustomDisplay(self , window , mouse_pos , events , keys):
-		
-		self.Play()
-
-
-	def Play(self):
-		bp =self.ball.hitbox.center # ball position 
-		center = self.hitbox.center
-
-		angle = tools.GetAngleBetween(center , bp )
-		focus_point = tools.GetPointOnCirc(angle ,  center , 1)
-		self.vel = focus_point
-
-
-
 
 
 class Player(BasePlayer):
@@ -158,6 +143,8 @@ class Player(BasePlayer):
 
 class GoalKeeper(BasePlayer):
 
+	"""
+	PLAYER THAT 	GUARDS A GOAL """
 
 	def __init__(self,    side , goal_line):
 
@@ -194,6 +181,8 @@ class GoalKeeper(BasePlayer):
 
 	def __str__(self):
 		return self.side + " > GoalKeeper <" 
+
+	# RETURN TO THE POST 
 	def ReturnToPost(self, goal_line):
 		if self.side == "away":
 			 
@@ -209,7 +198,7 @@ class GoalKeeper(BasePlayer):
 			self.radar = pygame.Rect(self.x ,self.y - 200 ,  self.radar_w , self.radar_h )
 
 
-
+	# UPDATE THE BALL DETECTION RADAR
 	def UpdateRadar(self ):
 
 		if self.side == "away":
@@ -227,6 +216,8 @@ class GoalKeeper(BasePlayer):
 		return
 
 		pygame.draw.rect(window , (34,65,11) , self.radar , 3)
+
+	# SHOOT THE BALL 
 	def Shoot(self):
 		if not self.HAS_BALL:
 			return
@@ -238,16 +229,60 @@ class GoalKeeper(BasePlayer):
 		ball = [b for b in w.GetEntities(Ball) ][0]
 
 		target =   450, random.choice( [ i for i in range(100, 500)])
+
+		# GET ANGLE BETWEEN BALL AND SHOOTING TARGET 
 		angle = tools.GetAngleBetween(   ball.hitbox.center, target)
 
+		#CALCULATE NEW BALL VELOCITY
 		vx = math.cos(math.radians(angle)) * self.shoot_speed
 		vy = math.sin(math.radians(angle)) * self.shoot_speed
 		self.SHOOTING = True 
 
+		# UPDATE THE BALL'S VELOCITY
 		ball.vel = vx,vy
+
+
+		# UPDATE LAST TOUCH TIME 
 		self.last_touch_time = time.time()
 
 
+
+
+
+
+
+
+
+class AI_Player(BasePlayer):
+
+	"""
+
+	PLAYER CONTROLLED BY THE COMPUTER..
+	TO BE CONTINUED"""
+	def __init__(self, pos,role , ball  ):
+		BasePlayer.__init__(self, pos , size = (50,50), hitbox_color = (20,2,9) )
+		self.role = role
+		self.ball =  ball 
+		self.MOVE_LOCK = False 
+		self.vel = (0,0)
+		self.angle = 0
+
+
+
+
+	 
+	def CustomDisplay(self , window , mouse_pos , events , keys):
+		
+		self.Play()
+
+
+	def Play(self):
+		bp =self.ball.hitbox.center # ball position 
+		center = self.hitbox.center
+
+		angle = tools.GetAngleBetween(center , bp )
+		focus_point = tools.GetPointOnCirc(angle ,  center , 1)
+		self.vel = focus_point
 
 
 

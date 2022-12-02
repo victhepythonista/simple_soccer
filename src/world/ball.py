@@ -6,7 +6,11 @@ from .entity import Entity
 
 
 class Ball(Entity): 
+	"""
 
+	bALL 
+
+	used to play the game.. possessed by a player """
 
 	def __init__(self, pos ):
 		Entity.__init__(self, pos , size = (10,10))
@@ -29,7 +33,11 @@ class Ball(Entity):
 
 class GoalLine(Entity):
 
+	"""
 
+	OBJECT used to represent the goals....used to detect  a goal scored
+
+	"""
 	def __init__(self, pos , side):
 		Entity.__init__(self, pos , size = (20,100), hitbox_color = (200,200,200))
 		self.side = side

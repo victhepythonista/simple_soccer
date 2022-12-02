@@ -1,9 +1,19 @@
+"""
+
+RUN THIS FILE TO PLAY THE GAME 
+
+RESULTS IN : RESULTS.txt
+
+
+
+
+"""
+
+
 import pygame, time  , math , random
 
-
-
 import colors , images
-from buttons import UIButton , SimpleButton
+from buttons import  SimpleButton
 from screen import Screen
 from tools import write_on_screen as wos , iload 
 from animation import PointAnimation
@@ -24,15 +34,13 @@ class GameScreen(Screen):
 	def __init__(self):
 		Screen.__init__(self)
 
-		self.entities = [] 
-		self.paused = False 
 		self.buttons = [ 
-		SimpleButton( (200,20), self.GoHome, "BACK", (120,40) ),
+		SimpleButton( (200,20), self.GoHome, "BACK", (120,40) ), 
 
 		 ]
 		self.world = World() 
 
-
+		# LISTS OF THE OBJECTS IN THE GAME
 		goal_lines= []
 		goal_keepers = [] 
 		home_players = [] 
@@ -42,6 +50,7 @@ class GameScreen(Screen):
 		# initialize sides 
 		for s in SIDES:
 			if s == "home":
+				# MAKE OBJECTS FOR HOME SIDE
 				goal_line = GoalLine((-10, 250 ),s) 
 				keeper = GoalKeeper( s, goal_line)
 				player = Player((200,450,), "striker",side = s)
@@ -52,6 +61,8 @@ class GameScreen(Screen):
 				home_players += [player, keeper]
 
 			elif s == "away":
+				# MAKE OBJECTS FOR  AWAY SIDE
+
 				goal_line = GoalLine((890, 250) , s)
 				keeper = GoalKeeper( s, goal_line)
 				player = Player((400,450,), "striker",side = s)
@@ -66,16 +77,15 @@ class GameScreen(Screen):
 
 		ball = Ball((200,100))
 		print("goal_keepers  _-- ",goal_keepers)
-		for g in goal_lines:
-			print("SIDE CHECK GoalLines", g.side)
-		 
+
 		 
 		for p in players:
+			# update the world attribute in the players
 			p.world = self.world
 
 	 	
-		self.world.AddEntities([ball  ] + players  + goal_lines)
-		self.game_manager = GameManager()
+		self.world.AddEntities([ball  ] + players  + goal_lines) # add the world objects
+		self.game_manager = GameManager() 
 		self.game_manager.Reset(random.choice(SIDES) , players , ball , goal_keepers , goal_lines)
 
 
@@ -97,15 +107,21 @@ class GameScreen(Screen):
 
  
 	def display_widgets(self):
+		# display the screen items 
 		self.window.fill("gray")
 
 		ball = self.world.GetEntities(Ball)[0]
 		players = self.world.GetEntities(Player)
 		goal_keepers = self.world.GetEntities(GoalKeeper)
 		goal_lines = self.world.GetEntities(GoalLine)
+
+		# display the pitch
 		self.window.blit(iload(images.pitch), (0, 100))
-		#message, position, window, color, fontsize,
+
+		# show the current scores
 		self.ShowScores()
+
+		# display the buttons
 		for b in self.buttons:
 			b.show(self.window, pygame.mouse.get_pos() , self.events)
 
@@ -115,6 +131,9 @@ class GameScreen(Screen):
 
 
 class  HelpScreen(Screen):
+	"""
+
+	SCREEN for showing Help information, rules and CONTROLS"""
 	def __init__(self):
 		Screen.__init__(self)
 
@@ -126,8 +145,10 @@ class  HelpScreen(Screen):
 		 ]
 
 	def BackHome(self):
+		# go back to Home screen
 		self.running = False
 		HomeScreen().show()
+
 	def display_widgets(self):
 
 		self.window.fill(pygame.Color("white")) 
@@ -144,9 +165,9 @@ class HomeScreen(Screen):
 		Screen.__init__(self)
 
 		self.buttons = [ 
-		SimpleButton( (200,150), self.PlayGame, "START", (240, 50) ),
-		SimpleButton( (200,250), self.ShowHelpMenu, "HELP" , (240, 50) ),
-		SimpleButton( (200,350), self.exit, "EXIT" , (240, 50) )
+		SimpleButton( (500,150), self.PlayGame, "START", (240, 50) ),
+		SimpleButton( (500,250), self.ShowHelpMenu, "HELP" , (240, 50) ),
+		SimpleButton( (500,350), self.exit, "EXIT" , (240, 50) )
 
 
 		 ]
@@ -155,23 +176,27 @@ class HomeScreen(Screen):
 
 
 	def ShowHelpMenu(self):
+		# display the help menu
+		self.running = False
 		HelpScreen().show()
 
 	def PlayGame(self):
+		# start the game
 		print("-starting a game ..")
 		self.running = False 
 
-		GameScreen().show()
+		GameScreen().show() # display the game screen
 		pass 
 
 	def display_widgets(self):
 
 		self.window.fill(pygame.Color("white")) 
-		#message, position, window, color, fontsize,
-		
+
+		# display the background image		
 		self.window.blit(iload(images.home_bg) , (0,0))
 		wos(" SIMPLE SOCCER " ,( 200,50) , self.window , (0,0,0) , 50 , "Lucida console")
 		
+		# show the buttons
 		for b in self.buttons:
 			b.show(self.window, pygame.mouse.get_pos() , self.events)
 

@@ -1,3 +1,9 @@
+### this script handles all  sound playing  mechanisms
+##########
+
+
+
+
 import pygame
 import time
 import threading
@@ -5,20 +11,14 @@ import threading
                      
 # sound files 
 sounds = {
-'shoot':'./data/sounds/swoosh.mp3',
+'shoot':'./data/sounds/swoosh1.mp3',
 'score_goal':'./data/sounds/scout_whistle_blow_2.mp3',
-"ball_out":"./data/sounds/scout_whistle_blow_short.mp3"
+"ball_out":"./data/sounds/scout_whistle_blow_short.mp3",
+"deflect":"./data/sounds/deflect2.mp3",
+"button_click":"./data/sounds/button_click.mp3"
 
 
- 
-}
-
-background_music = {
-	'jazz_french':'./data/sounds/jazzfrenchy.mp3',
-	'hipjazz':'./data/sounds/bensound-hipjazz.mp3',
- 
-}
-
+ }
  
 
 def load_sound(path, volume = .4):
@@ -27,11 +27,16 @@ def load_sound(path, volume = .4):
 	sound = pygame.mixer.Sound(path)
 	sound.set_volume(volume)
 	return  sound
-# handles game s
+
+ 
 class GameSounds:
     '''
     manages the in-game Sounds
+
+    refers the sounds DICT  to get the sounds
     '''
+
+    #  load the sound and play
     @staticmethod
     def load_and_play(sound,volume ):
     	pygame.mixer.init()
@@ -42,39 +47,23 @@ class GameSounds:
     	if pygame.mixer.music.get_busy() == False:
     		GameSounds.load_and_play(sound, volume)
 
-    	 
-    @staticmethod
-    def background_music(soundname = 'jazz_french', volume = .1):
-    	# continuously play background music
-    	GameSounds.load_and_play(background_music[soundname],volume)
-    @staticmethod
-    def  UI_background_music(soundname = 'hipjazz', volume = .1):
-    	GameSounds.load_and_play(background_music[soundname], volume)
-    #--------------- sound objects ------------------------#
+    # play a sound using  its key in the sounds dict
     @staticmethod
     def play(soundname, volume = 1):
 
+        # start a new thread  play the sound
     	target = GameSounds.play_sound
+
     	thread = threading.Thread(target = target, args = (soundname,volume))
     	thread.start()
         
+    # play a sound
     @staticmethod
     def play_sound(soundname, volume):
         pygame.mixer.init()
 
         sound  = load_sound(sounds[soundname])
-        try:
-            sound.play()
-        except:
-            return
+        sound.play()
     
-
-
-#test_sound = 'bounce_2'
-#while True:
-#	GameSounds.play(test_sound)
-#	time.sleep(1)
-
-#GameSounds.play('bounce_2')
 
  

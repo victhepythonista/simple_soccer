@@ -1,9 +1,15 @@
+# USEFUL TRIGONOMETRIC , ANALYTICAL and  SCREEN UTILS functions
+
 import pygame, math 
 
 from math import atan2,degrees
 
 
+# get the opposite side
 OppositeSide = lambda side: "home" if side == "away" else "away"
+
+
+# write a text onto a window
 def write_on_screen(  message, position, window, color, fontsize, font = 'consolas'):
     #### _this function  writes  a message to the user
     pygame.font.init()
@@ -16,7 +22,7 @@ def write_on_screen(  message, position, window, color, fontsize, font = 'consol
     window.blit(mess_render, position)
 
 
-
+# load an image file
 def iload(path):
 	return pygame.image.load(path)
 
@@ -34,10 +40,3 @@ def GetAngleBetween(pA, pB):
 
  
  
-
-if __name__ == '__main__':
-    a = 2,2
-    b = 10,2
-
-    print(GetAngleBetween(a,b))
-
