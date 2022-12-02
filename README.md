@@ -5,5 +5,6 @@
   * python game.py 
 > tinker with the speed controls and other global  variables  in the scripts for
 > better adjustment ./ just change number values
+#  RESULTS LOCATION : "RESULTS.txt"
 - Dependencies 
 - > pygame  
