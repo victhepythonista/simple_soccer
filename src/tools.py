@@ -21,12 +21,12 @@ def iload(path):
 	return pygame.image.load(path)
 
 
-
+# GET THE DISTANCE BETWEEN TWO 2D POINTS
 def DistanceBetween(p1, p2):
     distance = math.sqrt( ((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2) )
     return distance
  
-
+# GET THE ANGLE BETWEEN TWO POINTS
 def GetAngleBetween(pA, pB):
   changeInX = pB[0] - pA[0]
   changeInY = pB[1] - pA[1]
