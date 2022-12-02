@@ -1,6 +1,8 @@
 # USEFUL TRIGONOMETRIC , ANALYTICAL and  SCREEN UTILS functions
 
-import pygame, math 
+import pygame
+import math 
+from  datetime import datetime
 
 from math import atan2,degrees
 
@@ -40,3 +42,14 @@ def GetAngleBetween(pA, pB):
 
  
  
+ # Get the current time in a readable format 
+def GetNow():
+    now = datetime.now()
+    time_string = now.strftime(" %d-%m-%y %H:%M:%S")
+    return time_string
+
+
+
+
+if __name__ == '__main__':
+    print(GetNow())

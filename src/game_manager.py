@@ -5,7 +5,7 @@ import pygame
 import random
 import time
 
-from tools import DistanceBetween,OppositeSide 
+from tools import DistanceBetween,OppositeSide , GetNow
 
 from ui import GoalAnnouncement,Announcement 
 from world import *
@@ -41,7 +41,7 @@ class GameManager:
 		print("SAVING SCORES --")
 		score = self.scores
 		with open(self.scores_file, "a") as f:
-			f.write(f"{time.time()} :  {score['home'] }   |    {score['away']}")
+			f.write(f"{GetNow()}-->    {score['home'] }   |    {score['away']}")
 
 	def BackendManagement(self, goal_keepers, ball, goal_lines , players  ):
 		# DETECT BALL OUTSIDE THE PITCH RECT 
