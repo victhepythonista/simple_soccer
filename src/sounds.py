@@ -2,19 +2,15 @@ import pygame
 import time
 import threading
 
-
-'''
-'''
-
+                     
+# sound files 
 sounds = {
-'bounce_off_wall':'./data/sounds/bounce_ground_002.mp3',
-'bounce_in_jar':'./data/sounds/bounce_ground_001.mp3',
-'bounce_off_rim':'./data/sounds/hit_rim.mp3',
-'bounce_off_wood':'./data/sounds/bounce_off_wood.mp3',
-'hit_ball_obstacle':'./data/sounds/hit_ball_obstacle.mp3',
-'hit_woody_obstacle':'./data/sounds/bounce_off_wood.mp3',
-'in_jar':'./data/sounds/glass_window_object_knock_bounce.mp3',
-'snip':'./data/sounds/snip.mp3'
+'shoot':'./data/sounds/swoosh.mp3',
+'score_goal':'./data/sounds/scout_whistle_blow_2.mp3',
+"ball_out":"./data/sounds/scout_whistle_blow_short.mp3"
+
+
+ 
 }
 
 background_music = {
@@ -57,16 +53,20 @@ class GameSounds:
     #--------------- sound objects ------------------------#
     @staticmethod
     def play(soundname, volume = 1):
+
     	target = GameSounds.play_sound
     	thread = threading.Thread(target = target, args = (soundname,volume))
     	thread.start()
         
     @staticmethod
     def play_sound(soundname, volume):
-    	pygame.mixer.init()
-    	sound  = load_sound(sounds[soundname])
-    	sound.play()
-    	 
+        pygame.mixer.init()
+
+        sound  = load_sound(sounds[soundname])
+        try:
+            sound.play()
+        except:
+            return
     
 
 

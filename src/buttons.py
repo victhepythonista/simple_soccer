@@ -92,7 +92,7 @@ class UIButton(TransparentNoRectButton):
  
 class SimpleButton(Widget):
 
-    def __init__(self,pos, action,text, dimensions,args = None,kwargs = None,border_radius = 3,border_width = 0,normal_rectcolor = (255,255,255), highlighted_rectcolor = (0,0,0), highlighted_textcolor =(255,255,255) ,textcolor =(10,10,10), font_size= 30,font = 'consolas',highlight_scale_factor = 0):
+    def __init__(self,pos, action,text, dimensions,args = None,kwargs = None,border_radius = 5,border_width = 0,normal_rectcolor = (25,55,155), highlighted_rectcolor = (0,0,0), highlighted_textcolor =(255,255,255) ,textcolor =(210,200,210), font_size= 30,font = 'consolas',highlight_scale_factor = 0):
         Widget.__init__(self)
         self.action = action
         self.font = font

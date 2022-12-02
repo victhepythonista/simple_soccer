@@ -13,16 +13,14 @@ from game_manager import GameManager
 
 
  
-
-class ScreenManager:
-
-	def __init__(self):
-
-		self.screens = []
-
-
+SIDES = "home","away"
+ 
 
 class GameScreen(Screen):
+	"""
+	Screen class that contains all the games objects and displays them 
+
+	"""
 	def __init__(self):
 		Screen.__init__(self)
 
@@ -33,31 +31,62 @@ class GameScreen(Screen):
 
 		 ]
 		self.world = World() 
-		goal_lines = [GoalLine((-10, 250),"home") , GoalLine((890,250), "away")]
-		ball = Ball((200,100))
-		goalies = [GoalKeeper(goal_lines[0]),GoalKeeper(goal_lines[1])  ]
-		for g in goalies:
-			g.world = self.world
-		home_players = [Player((100,200,), "striker", side = "home"),]
-		away_players = [Player((100,450,), "striker",side = "away"),]
-		all_players = home_players +  goalies +away_players
-		self.world.AddEntities([ball  ] + all_players  + goal_lines)
-		self.game_manager = GameManager()
 
-		for p in self.world.GetEntities(Player):
+
+		goal_lines= []
+		goal_keepers = [] 
+		home_players = [] 
+		away_players = [] 
+		players  = [] 
+
+		# initialize sides 
+		for s in SIDES:
+			if s == "home":
+				goal_line = GoalLine((-10, 250 ),s) 
+				keeper = GoalKeeper( s, goal_line)
+				player = Player((200,450,), "striker",side = s)
+				
+
+				goal_lines.append(goal_line)
+				goal_keepers.append(keeper)
+				home_players += [player, keeper]
+
+			elif s == "away":
+				goal_line = GoalLine((890, 250) , s)
+				keeper = GoalKeeper( s, goal_line)
+				player = Player((400,450,), "striker",side = s)
+
+
+				goal_lines.append(goal_line)
+				goal_keepers.append(keeper)
+				away_players += [ player , keeper]
+
+
+		players = home_players + away_players 
+
+		ball = Ball((200,100))
+		print("goal_keepers  _-- ",goal_keepers)
+		for g in goal_lines:
+			print("SIDE CHECK GoalLines", g.side)
+		 
+		 
+		for p in players:
 			p.world = self.world
 
-		self.game_manager.Reset(random.choice(["home", "away" ]), all_players , ball, goal = False)
-
+	 	
+		self.world.AddEntities([ball  ] + players  + goal_lines)
+		self.game_manager = GameManager()
+		self.game_manager.Reset(random.choice(SIDES) , players , ball , goal_keepers , goal_lines)
 
 
 	def GoHome(self):
+		# go back to home screen 
 		self.running = False 
 		HomeScreen().show()
 
-	def Pause(self):
-		print("paused")
+	 
 	def ShowScores(self):
+		# write the current scores onto the screen 
 		scores = self.game_manager.scores
 		board_pos  = 480,20
 		self.window.blit(iload(images.score_board), board_pos)
@@ -74,7 +103,6 @@ class GameScreen(Screen):
 		players = self.world.GetEntities(Player)
 		goal_keepers = self.world.GetEntities(GoalKeeper)
 		goal_lines = self.world.GetEntities(GoalLine)
-
 		self.window.blit(iload(images.pitch), (0, 100))
 		#message, position, window, color, fontsize,
 		self.ShowScores()
@@ -140,9 +168,13 @@ class HomeScreen(Screen):
 
 		self.window.fill(pygame.Color("white")) 
 		#message, position, window, color, fontsize,
+		
+		self.window.blit(iload(images.home_bg) , (0,0))
 		wos(" SIMPLE SOCCER " ,( 200,50) , self.window , (0,0,0) , 50 , "Lucida console")
-
+		
 		for b in self.buttons:
 			b.show(self.window, pygame.mouse.get_pos() , self.events)
+
 if __name__ == '__main__':
+	# START THE GAME 
 	HomeScreen().show()

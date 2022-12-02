@@ -35,3 +35,6 @@ class GoalLine(Entity):
 		self.side = side
 		 
 
+	def __repr__(self):
+		return "GOAL LINE -/ " +  self.side
+

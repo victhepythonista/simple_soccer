@@ -2,6 +2,8 @@ import pygame, math
 
 from math import atan2,degrees
 
+
+OppositeSide = lambda side: "home" if side == "away" else "away"
 def write_on_screen(  message, position, window, color, fontsize, font = 'consolas'):
     #### _this function  writes  a message to the user
     pygame.font.init()

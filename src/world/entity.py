@@ -6,6 +6,7 @@ import pygame
  
 class Entity:
     def __init__(self,pos  , size = (50,50)  , hitbox_color = (200,54,76) ):
+        print('ENTITY POS : ',pos)
         self.x = pos[0]
         self.y = pos[1]
         self.pos = pos

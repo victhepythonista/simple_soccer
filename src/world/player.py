@@ -8,6 +8,9 @@ from .entity import Entity
 from .ball import Ball ,GoalLine
 from key_mapping import CONTROLS  
 
+
+from sounds import GameSounds as GS
+
 side = ["home", "away"]
  
 class BasePlayer(Entity):
@@ -24,6 +27,8 @@ class BasePlayer(Entity):
 		self.shoot_speed = 6
 		self.last_touch_time = 0
 
+	def __str__(self):
+		return "PLAYER > " + self.side
 	def Shoot(self):
 		 
 		w = self.world 
@@ -46,6 +51,7 @@ class BasePlayer(Entity):
 
 		ball.vel = vx,vy
 		self.last_touch_time = time.time()
+		GS.play("shoot")
 class AI_Player(BasePlayer):
 
 
@@ -153,45 +159,74 @@ class Player(BasePlayer):
 class GoalKeeper(BasePlayer):
 
 
-	def __init__(self,   goal_line  ):
-		side = goal_line.side
+	def __init__(self,    side , goal_line):
+
+		
 		hitbox_color = colors.home_team if side == "home" else colors.away_team
 		
-		
+		print("side check ", side)
 		BasePlayer.__init__(self, goal_line.pos , size = (30,30), hitbox_color = hitbox_color )
 		self.radar = None 
-		self.radar_w  = 400 
-		self.radar_h = 400 
+		self.radar_w  = 300 
+		self.radar_h = 300
 		self.MOVE_LOCK = True
 		self.vel = (0,2)
 		self.goal_line = goal_line 
-
 		if side == "away":
 			bp = self.hitbox.topleft
 			self.ball_position = bp[0] - 30, bp[1]
-			x = 900 - self.width
-			y = goal_line.hitbox.y +10 
-			self.radar = pygame.Rect(self.x - 200, self.y - 100, self.radar_w,self.radar_h )
-			self.UpdatePos((x,y))
+			x = 900 - - self.radar_w
+			y = goal_line.hitbox.y +13
+			self.radar = pygame.Rect(self.x - self.radar_w, 150, self.radar_w,self.radar_h )
+			self.UpdatePos((900 - self.width - 10, goal_line.hitbox.y + 20))
 		elif side == "home":
 			bp = self.hitbox.topright
 			self.ball_position = bp
 			self.pos = goal_line.hitbox.midright
-			self.radar = pygame.Rect(self.x ,self.y - 200 ,  self.radar_w , self.radar_h )
+			self.radar = pygame.Rect(self.x ,150 ,  self.radar_w , self.radar_h )
 
 		self.ball_position = (self.hitbox.topright)
+		print("INIT SIDE GoalKeeper", side)
+
+	def __repr__(self):
+		return self.side + " > GoalKeeper <" 
+	
+
+	def __str__(self):
+		return self.side + " > GoalKeeper <" 
+	def ReturnToPost(self, goal_line):
+		if self.side == "away":
+			 
+			x = 900 - self.width
+			y = random.choice([ i for i in range(goal_line.hitbox.y ,  goal_line.hitbox.bottomright[1], 10)]) 
+			self.UpdatePos((x,y))
+
+			self.radar = pygame.Rect(self.x - 200, self.y - 100, self.radar_w,self.radar_h )
+		elif self.side == "home":
+			x =0 
+			y = random.choice([ i for i in range(goal_line.hitbox.y ,  goal_line.hitbox.bottomright[1], 10)]) 
+			self.UpdatePos((x,y))
+			self.radar = pygame.Rect(self.x ,self.y - 200 ,  self.radar_w , self.radar_h )
+
 
 
 	def UpdateRadar(self ):
-		if side == "away":
+
+		if self.side == "away":
 		 
-			self.radar = pygame.Rect(self.x - 200, self.y - 100, 300,300 )
-		elif side == "home":
+			self.radar = pygame.Rect(900- self.radar_w, self.y - 50, self.radar_w,self.radar_h )
 			 
-			self.radar = pygame.Rect(self.x ,self.y - 200 , 300,300 )
+			print("away radar , ", self.radar)
+
+		elif self.side == "home":
+			 
+		 
+			self.radar = pygame.Rect(self.x ,self.y - 100 ,self.radar_w,self.radar_h)
  
 	def CustomDisplay(self , window , mouse_pos , events, keys ):
-		self.UpdateRadar( )
+		return
+
+		pygame.draw.rect(window , (34,65,11) , self.radar , 3)
 	def Shoot(self):
 		if not self.HAS_BALL:
 			return
